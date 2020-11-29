@@ -1,0 +1,20 @@
+{
+  "name": "synbot",
+  "version": "1.0.0",
+  "description": "Discord Bot",
+  "main": "bot.js",
+  "author": "SynysterZV#8093",
+  "dependencies": {
+    "@discordjs/opus": "^0.3.3",
+    "discord.io": "https://github.com/woor/discord.io/tarball/gateway_v6",
+    "discord.js": "^12.5.1",
+    "ffmpeg": "0.0.4",
+    "ffmpeg-static": "^4.2.7",
+    "node-fetch": "^2.6.1",
+    "sequelize": "^6.3.5",
+    "sqlite3": "^5.0.0",
+    "winston": "^3.3.3",
+    "yt-search": "^2.5.0",
+    "ytdl-core": "^4.1.0"
+  }
+}
