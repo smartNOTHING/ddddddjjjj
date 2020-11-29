@@ -5,11 +5,12 @@ const ytdl = require('ytdl-core');
 const yts = require('yt-search');
 const urlLib = require('url');
 const https = require('https');
-const { prefix, token } = require('./config.json');
+const config = require('./config.json');
+const prefix = config.prefix
 const { cpuUsage } = require('process');
 const { Http2ServerRequest } = require('http2');
 const queue = new Map();
-
+const auth = require('./auth.json');
 
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
@@ -184,4 +185,4 @@ client.on('message', async message => {
 
 });
 
-client.login(token);
+client.login(auth.token);
