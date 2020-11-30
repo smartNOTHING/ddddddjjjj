@@ -2,7 +2,7 @@ module.exports = {
     name: 'clear',
     args: true,
     usage: 'number of messages to delete',
-    descritption: 'Clear',
+    description: 'Clear',
     async execute(message, args) {
         const amount = args.join(' ');
 

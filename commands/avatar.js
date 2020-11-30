@@ -1,7 +1,7 @@
 module.exports = {
     name: 'avatar',
     aliases: ['icon', 'pfp'],
-    descriptions: "Get avatar",
+    description: "Get avatar",
     execute(message, args, client) {
 
 
