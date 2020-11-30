@@ -1,2 +1,5 @@
+MusicBot/
+web-api-auth-examples/
 node_modules/
 auth.json
+*.sqlite

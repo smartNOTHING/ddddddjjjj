@@ -11,6 +11,10 @@ const { cpuUsage } = require('process');
 const { Http2ServerRequest } = require('http2');
 const queue = new Map();
 const auth = require('./auth.json');
+const tldr = require('tldr')
+const { Sequelize } = require('sequelize');
+
+
 
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
@@ -22,6 +26,27 @@ for (const file of commandFiles) {
 }
 
 
+const sequelize = new Sequelize('database', 'user', 'password', {
+    host: 'localhost',
+    dialect: 'sqlite',
+    logging: false,
+    storage: 'database.sqlite',
+});
+
+const Tags = sequelize.define('tags', {
+    name: {
+        type: Sequelize.STRING,
+        unique: true,
+    },
+    description: Sequelize.TEXT,
+    username: Sequelize.STRING,
+    usage_count: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        allowNull: false,
+    },
+})
+
 
 client.once('ready', () => {
     console.log('Ready!');
@@ -32,6 +57,7 @@ client.once('ready', () => {
             type: "PLAYING"
         }
     });
+    Tags.sync();
 });
 
 client.on('message', async message => {
@@ -41,13 +67,72 @@ client.on('message', async message => {
     const commandName = args.shift().toLowerCase();
     const command = client.commands.get(commandName)
         || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
+    const desc = client.commands.find(cmd => cmd.description)
+    const commandArgs = args.join();
+
 
     
 
     const serverQueue = queue.get(message.guild.id);
 
-    
-    if (commandName == 'play' || commandName == 'p') {
+    if (commandName == 'addtag') {
+        
+        const tagName = args.shift();
+        const tagDescription = args.join();
+
+        try {
+            const tag = await Tags.create({
+                name: tagName,
+                description: tagDescription,
+                username: message.author.username,
+            });
+            return message.reply(`Tag ${tag.name} added.`);
+        }
+        catch (e) {
+            if (e.name === 'SequelizeUniqueConstraintError') {
+                return message.reply('That tag already exists');
+            }
+            return message.reply('Something went wrong with adding a tag');
+        }
+    } else if (commandName === 'tag') {
+        const tagName = args;
+
+        const tag = await Tags.findOne({ where: {name: tagName }});
+
+        if (tag) {
+            tag.increment('usage_count');
+            return message.channel.send(tag.get('description'));
+        }
+        return message.reply(`Could not find tag: ${tagName}`);
+    } else if (commandName == 'edittag') {
+        const tagName = args.shift();
+        const tagDescription = args.join();
+
+        const affectedRows = await Tags.update({ description: tagDescription}, { where: { name: tagName}});
+        if (affectedRows > 0) {
+            return message.reply(`Tag ${tagName} was edited.`)
+        }
+        return message.reply(`Could not find a tag with name ${tagName}`)
+    } else if (commandName == 'taginfo') {
+        const tagName = args;
+
+        const tag = await Tags.findOne({where: {name: tagName}})
+        if (tag){
+            return message.channel.send(`${tagName} was created by ${tag.username} at ${tag.createdAt} and has been used ${tag.usage_count} times`)
+        }
+        return message.reply(`Could not find tag: ${tagName}`)
+    } else if (commandName == 'showtags') {
+        const tagList = await Tags.findAll({ attributes: ['name']});
+        const tagString = tagList.map(t => t.name).join(', ') || 'No tags set.';
+        return message.channel.send(`List of tags: ${tagString}`);
+    } else if (commandName === 'removetag') {
+        const tagName = args;
+        const rowCount = await Tags.destroy({ where: {name: tagName }});
+        if (!rowCount) return message.reply('That tag did not exist.');
+
+        return message.reply('Tag deleted.');
+    }
+    else if (commandName == 'play' || commandName == 'p') {
         execute(message, serverQueue);
         return;
     } 
@@ -181,6 +266,7 @@ client.on('message', async message => {
           }
           message.channel.send(embed);
       }
+
 
 
 });

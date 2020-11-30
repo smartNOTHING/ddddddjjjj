@@ -12,9 +12,12 @@
     "ffmpeg-static": "^4.2.7",
     "node-fetch": "^2.6.1",
     "sequelize": "^6.3.5",
+    "spotify-web-api-js": "^1.5.1",
+    "spotify-web-api-node": "^5.0.0",
     "sqlite3": "^5.0.0",
+    "tldr": "^3.3.5",
     "winston": "^3.3.3",
     "yt-search": "^2.5.0",
-    "ytdl-core": "^4.1.0"
+    "ytdl-core": "^4.1.1"
   }
 }
