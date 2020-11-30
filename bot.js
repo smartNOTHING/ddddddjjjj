@@ -15,10 +15,13 @@ const tldr = require('tldr')
 const { Sequelize, Op } = require('sequelize');
 const { Users, CurrencyShop } = require('./dbObjects');
 const currency = new Discord.Collection();
+const Keyv = require('keyv');
 
 
 
 const client = new Discord.Client();
+const prefixes = new Keyv('sqlite://database.sqlite')
+const globalPrefix = config.prefix;
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
@@ -95,14 +98,27 @@ client.on('message', async message => {
     if (message.author.bot) return;
     currency.add(message.author.id, 1);
 
-    if (!message.content.startsWith(prefix) || message.author.bot) return;
+    let args;
+    if (message.guild) {
+        let prefix;
 
-	const args = message.content.slice(prefix.length).trim().split(/ +/);
+        if (message.content.startsWith(globalPrefix)) {
+            prefix = globalPrefix;
+        } else {
+            const guildPrefix = await prefixes.get(message.guild.id);
+            if (message.content.startsWith(guildPrefix)) prefix = guildPrefix;
+        }
+
+        if (!prefix) return;
+        args = message.content.slice(prefix.length).trim().split(/\s+/);
+    } else {
+        const slice = message.content.startsWith(globalPrefix) ? globalPrefix.length : 0;
+        args = message.content.slice(slice).split(/\s+/);
+    }
+
     const commandName = args.shift().toLowerCase();
     const command = client.commands.get(commandName)
         || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
-    const desc = client.commands.find(cmd => cmd.description)
-    const commandArgs = args.join();
 
     const serverQueue = "";
     
@@ -110,7 +126,14 @@ client.on('message', async message => {
     const serverQueue = queue.get(message.guild.id);
     }
 
-    if (commandName == 'balance') {
+    if (commandName == 'prefix') {
+        if (args.length) {
+            await prefixes.set(message.guild.id, args[0]);
+            return message.channel.send(`Successfully set prefix to \`${args[0]}\``)
+        }
+
+        return message.channel.send(`Prefix is \`${await prefixes.get(message.guild.id) || globalPrefix}\``)
+    } else if (commandName == 'balance') {
         balance();
         return;
     } else if (commandName == 'inventory') {

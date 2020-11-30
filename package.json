@@ -6,10 +6,12 @@
   "author": "SynysterZV#8093",
   "dependencies": {
     "@discordjs/opus": "^0.3.3",
+    "@keyv/sqlite": "^2.0.2",
     "discord.io": "https://github.com/woor/discord.io/tarball/gateway_v6",
     "discord.js": "^12.5.1",
     "ffmpeg": "0.0.4",
     "ffmpeg-static": "^4.2.7",
+    "keyv": "^4.0.3",
     "node-fetch": "^2.6.1",
     "sequelize": "^6.3.5",
     "spotify-web-api-js": "^1.5.1",
