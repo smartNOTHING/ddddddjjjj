@@ -22,8 +22,10 @@ const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('
 
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
-    client.commands.set(command.name, command);
+    client.commands.set(command.name, command, command.description);
 }
+
+
 
 
 const sequelize = new Sequelize('database', 'user', 'password', {
@@ -74,15 +76,18 @@ client.on('message', async message => {
     const desc = client.commands.find(cmd => cmd.description)
     const commandArgs = args.join();
 
-
+const serverQueue = "";
     
     if (message.guild) {
     const serverQueue = queue.get(message.guild.id);
     }
 
   
-
-    if (commandName == 'addtag') {
+    if (commandName == 'help'){
+        help();
+        return;
+    }
+    else if (commandName == 'addtag') {
         
         const tagName = args.shift();
         const tagDescription = args.join();
@@ -166,6 +171,7 @@ client.on('message', async message => {
     
     try {
         command.execute(message, args, fs, fetch, client);
+        
     } catch (error) {
         console.error(error);
         message.reply('there was an error trying to execute that command!');
@@ -274,7 +280,17 @@ client.on('message', async message => {
           message.channel.send(embed);
       }
 
+      function help(){
+            const embed = new Discord.MessageEmbed()
+            .setTitle('Help')
+            .setColor(0xff0000)
 
+            for (const file of commandFiles) {
+                const fileName = require(`./commands/${file}`)
+                embed.addField(fileName.name, fileName.description)
+            }
+          message.channel.send(embed)
+      }
 
 });
 
