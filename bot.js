@@ -15,10 +15,13 @@ const tldr = require('tldr')
 const { Sequelize, Op } = require('sequelize');
 const { Users, CurrencyShop } = require('./dbObjects');
 const currency = new Discord.Collection();
+const Keyv = require('keyv');
 
 
 
 const client = new Discord.Client();
+const prefixes = new Keyv('sqlite://database.sqlite')
+const globalPrefix = config.prefix;
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
@@ -95,14 +98,27 @@ client.on('message', async message => {
     if (message.author.bot) return;
     currency.add(message.author.id, 1);
 
-    if (!message.content.startsWith(prefix) || message.author.bot) return;
+    let args;
+    if (message.guild) {
+        let prefix;
 
-	const args = message.content.slice(prefix.length).trim().split(/ +/);
+        if (message.content.startsWith(globalPrefix)) {
+            prefix = globalPrefix;
+        } else {
+            const guildPrefix = await prefixes.get(message.guild.id);
+            if (message.content.startsWith(guildPrefix)) prefix = guildPrefix;
+        }
+
+        if (!prefix) return;
+        args = message.content.slice(prefix.length).trim().split(/\s+/);
+    } else {
+        const slice = message.content.startsWith(globalPrefix) ? globalPrefix.length : 0;
+        args = message.content.slice(slice).split(/\s+/);
+    }
+
     const commandName = args.shift().toLowerCase();
     const command = client.commands.get(commandName)
         || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
-    const desc = client.commands.find(cmd => cmd.description)
-    const commandArgs = args.join();
 
     const serverQueue = "";
     
@@ -110,53 +126,31 @@ client.on('message', async message => {
     const serverQueue = queue.get(message.guild.id);
     }
 
-    if (commandName == 'balance') {
-        const target = message.mentions.users.first() || message.author;
-        return message.channel.send(`${target.tag} has $${currency.getBalance(target.id)}`);
-    } else if (commandName == 'inventory') {
-        const target = message.mentions.users.first() || message.author;
-        const user = await Users.findOne({ where: {user_id: target.id } });
-        const items = await user.getItems();
-
-        if (!items.length) return message.channel.send(`${target.tag} has nothing!`);
-        return message.channel.send(`${target.tag} currently has ${items.map(i => `${i.amount} ${i.item.name}`).join(', ')}`);
-    } else if (commandName == 'transfer') {
-        const currentAmount = currency.getBalance(message.author.id);
-        const transferAmount = args.find(arg => !/<@?\d+>/g.test(arg));
-        const transferTarget = message.mentions.user.first();
-
-        if (!transferAmount || isNaN(transferAmount)) return message.channel.send(`Sorry ${message.author}, thats an invalid amount.`);
-        if (transferAmount > currentAmount) return message.channel.send(`Sorry ${message.author}, your only have ${currentAmount}.`);
-        if (transferAmount <= 0) return message.channel.send(`Please enter an amount greater than zerom ${message.author}.`);
-
-        currency.add(message.author.id, -transferAmount)
-        currency.add(transferTarget.id, transferAmount);
-
-        return message.channel.send(`Successfully transferred $${transferTarget.tag} to ${transferTarget.tag}. Your current balance is $${currency.getBalance(message.author.id)}`);
-    } else if (commandName == 'buy') {
-        const item = await CurrencyShop.findOne({ where: { name: { [Op.like]: args } } });
-        if (!item) return message.channel.send(`That item doesn't exist.`);
-        if (item.cost > currency.getBalance(message.author.id)) {
-            return message.channel.send(`You currently have ${currency.getBalance(message.author.id)}, but the ${item.name} costs ${item.cost}!`);
+    if (commandName == 'prefix') {
+        if (args.length) {
+            await prefixes.set(message.guild.id, args[0]);
+            return message.channel.send(`Successfully set prefix to \`${args[0]}\``)
         }
 
-        const user = await Users.findOne({ where: { user_id: message.author.id } });
-        currency.add(message.author.id, -item.cost);
-        await user.addItem(item);
-
-        message.channel.send(`You've bought: ${item.name}.`);
+        return message.channel.send(`Prefix is \`${await prefixes.get(message.guild.id) || globalPrefix}\``)
+    } else if (commandName == 'balance') {
+        balance();
+        return;
+    } else if (commandName == 'inventory') {
+        inventory();
+        return;
+    } else if (commandName == 'transfer') {
+        transfer();
+        return;
+    } else if (commandName == 'buy') {
+        buy();
+        return;
     } else if (commandName == 'shop') {
-        const items = await CurrencyShop.findAll();
-        return message.channel.send(items.map(item => `${item.name}: $${item.cost}`).join('\n'), {code: true });
+        shop();
+        return;
     } else if (commandName == 'leaderboard') {
-        return message.channel.send(
-            currency.sort((a,b) => b.balance - a.balance)
-                .filter(user => client.users.cache.has(user.user_id))
-                .first(10)
-                .map((user, position) => `(${position + 1}) ${(client.users.cache.get(user.user_id).tag)}: $${user.balance}`)
-                .join('\n'),
-            { code: true }
-        );
+        leaderboard();
+        return;
     } else if (commandName == 'help'){
         help();
         return;
@@ -394,7 +388,64 @@ client.on('message', async message => {
         return message.reply('Tag deleted.');
       }
 
+      function balance(){
+        const target = message.mentions.users.first() || message.author;
+        return message.channel.send(`${target.tag} has $${currency.getBalance(target.id)}`);
+      }
 
+      async function inventory(){
+        const target = message.mentions.users.first() || message.author;
+        const user = await Users.findOne({ where: {user_id: target.id } });
+        const items = await user.getItems();
+
+        if (!items.length) return message.channel.send(`${target.tag} has nothing!`);
+        return message.channel.send(`${target.tag} currently has ${items.map(i => `${i.amount} ${i.item.name}`).join(', ')}`);
+      }
+
+      function transfer(){
+        const currentAmount = currency.getBalance(message.author.id);
+        const transferAmount = args.find(arg => !/<@?\d+>/g.test(arg));
+        const transferTarget = message.mentions.user.first();
+
+        if (!transferAmount || isNaN(transferAmount)) return message.channel.send(`Sorry ${message.author}, thats an invalid amount.`);
+        if (transferAmount > currentAmount) return message.channel.send(`Sorry ${message.author}, your only have ${currentAmount}.`);
+        if (transferAmount <= 0) return message.channel.send(`Please enter an amount greater than zerom ${message.author}.`);
+
+        currency.add(message.author.id, -transferAmount)
+        currency.add(transferTarget.id, transferAmount);
+
+        return message.channel.send(`Successfully transferred $${transferTarget.tag} to ${transferTarget.tag}. Your current balance is $${currency.getBalance(message.author.id)}`);
+      }
+
+      async function buy(){
+        const item = await CurrencyShop.findOne({ where: { name: { [Op.like]: args } } });
+        if (!item) return message.channel.send(`That item doesn't exist.`);
+        if (item.cost > currency.getBalance(message.author.id)) {
+            return message.channel.send(`You currently have ${currency.getBalance(message.author.id)}, but the ${item.name} costs ${item.cost}!`);
+        }
+
+        const user = await Users.findOne({ where: { user_id: message.author.id } });
+        currency.add(message.author.id, -item.cost);
+        await user.addItem(item);
+
+        message.channel.send(`You've bought: ${item.name}.`);
+      }
+
+     async function shop(){
+        const items = await CurrencyShop.findAll();
+        return message.channel.send(items.map(item => `${item.name}: $${item.cost}`).join('\n'), {code: true });
+      }
+
+      function leaderboard(){
+        return message.channel.send(
+            currency.sort((a,b) => b.balance - a.balance)
+                .filter(user => client.users.cache.has(user.user_id))
+                .first(10)
+                .map((user, position) => `(${position + 1}) ${(client.users.cache.get(user.user_id).tag)}: $${user.balance}`)
+                .join('\n'),
+            { code: true }
+        );
+      }
 
 });
 
