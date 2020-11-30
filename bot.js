@@ -61,7 +61,11 @@ client.once('ready', () => {
 });
 
 client.on('message', async message => {
-	if (!message.content.startsWith(prefix) || message.author.bot) return;
+    if(!message.guild) {
+        console.log(`${message.author.username}: ${message.content}`)
+    }
+    
+    if (!message.content.startsWith(prefix) || message.author.bot) return;
 
 	const args = message.content.slice(prefix.length).trim().split(/ +/);
     const commandName = args.shift().toLowerCase();
@@ -72,8 +76,11 @@ client.on('message', async message => {
 
 
     
-
+    if (message.guild) {
     const serverQueue = queue.get(message.guild.id);
+    }
+
+  
 
     if (commandName == 'addtag') {
         
