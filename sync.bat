@@ -1,0 +1,2 @@
+node dbInit.js
+pause
