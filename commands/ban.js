@@ -2,6 +2,8 @@ module.exports = {
     name: 'ban',
     description: 'ban',
     usage: '{mention} {reason}',
+    args: true,
+    admin: true,
     async execute(args, message) {
         const getUserFromMention = require('./getUserFromMention');
 
