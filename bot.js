@@ -1,4 +1,3 @@
-const fs = require('fs');
 const { client, prefixes, globalPrefix, auth } = require('./client/Client');
 const { Users } = require('./dbObjects');
 const { currency } = require('./models/Currency');
@@ -57,7 +56,7 @@ client.on('message', async message => {
         }
         return message.channel.send(reply);
     } try {
-        command.execute(args, message, fs, globalPrefix);
+        command.execute(args, message, globalPrefix);
     }
     catch (error) {
         console.error(error);
