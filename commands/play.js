@@ -1,6 +1,6 @@
 const ytdl = require('ytdl-core');
 const yts = require('yt-search');
-const { queue } = require('../bot');
+const queue = new Map();
 
 module.exports = {
     name: 'play',

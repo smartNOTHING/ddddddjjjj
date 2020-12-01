@@ -5,7 +5,7 @@ module.exports = {
     name: 'buy',
     description: 'buy',
     async execute(args, message) {
-        const { currency } = require('../bot');
+        const { currency } = require('../models/Currency');
         const item = await CurrencyShop.findOne({ where: { name: { [Op.like]: args } } });
         if (!item) return message.channel.send(`That item doesn't exist.`);
         if (item.cost > currency.getBalance(message.author.id)) {

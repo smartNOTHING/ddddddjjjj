@@ -1,20 +1,16 @@
 const fs = require('fs');
 const Discord = require('discord.js');
-const fetch = require('node-fetch');
 const config = require('./config.json');
 const auth = require('./auth.json');
 const { Users } = require('./dbObjects');
-const currency = new Discord.Collection();
+const { currency } = require('./models/Currency');
 const Keyv = require('keyv');
-
-let serverQueue;
-const queue = new Map();
-module.exports = { serverQueue, queue };
 
 
 const client = new Discord.Client();
 const prefixes = new Keyv('sqlite://database.sqlite');
 const globalPrefix = config.prefix;
+
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
@@ -22,27 +18,6 @@ for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
 	client.commands.set(command.name, command, command.description);
 }
-
-Reflect.defineProperty(currency, 'add', {
-    value: async function add(id, amount) {
-        const user = currency.get(id);
-        if (user) {
-            user.balance += Number(amount);
-            return user.save();
-        }
-        const newUser = await Users.create({ user_id: id, balance: amount });
-        currency.set(id, newUser);
-        return newUser;
-    },
-});
-
-Reflect.defineProperty(currency, 'getBalance', {
-    value: function getBalance(id) {
-        const user = currency.get(id);
-        return user ? user.balance : 0;
-    },
-});
-
 
 client.once('ready', async () => {
     const storedBalances = await Users.findAll();
@@ -59,13 +34,12 @@ client.once('ready', async () => {
 
 client.on('message', async message => {
     module.exports = { client, currency, prefixes };
-    if(!message.guild && !message.author.bot) {
-        console.log(`${message.author.username}: ${message.content}`);
-    } if (message.author.bot) return;
+    if (message.author.bot) return;
     currency.add(message.author.id, 1);
 
     let args;
     let prefix;
+
     if (message.guild) {
         if (message.content.startsWith(globalPrefix)) {
             prefix = globalPrefix;
@@ -83,6 +57,7 @@ client.on('message', async message => {
         args = message.content.slice(slice).split(/\s+/);
     }
 
+
     const commandName = args.shift().toLowerCase();
     const command = client.commands.get(commandName)
         || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
@@ -96,7 +71,7 @@ client.on('message', async message => {
         }
         return message.channel.send(reply);
     } try {
-        command.execute(args, message, fs, fetch, globalPrefix);
+        command.execute(args, message, fs, globalPrefix);
     }
     catch (error) {
         console.error(error);

@@ -2,7 +2,8 @@ module.exports = {
     name: 'leaderboard',
     description: 'leaderboard',
     execute(args, message) {
-    const { client, currency } = require('../bot')
+    const { client } = require('../bot');
+    const { currency } = require('../models/Currency');
     return message.channel.send(
     currency.sort((a, b) => b.balance - a.balance)
         .filter(user => client.users.cache.has(user.user_id))

@@ -2,7 +2,7 @@ module.exports = {
     name: 'transfer',
     description: 'transfer',
     async execute(args, message) {
-        const { currency } = require('../bot');
+        const { currency } = require('../models/Currency');
         const currentAmount = currency.getBalance(message.author.id);
         const transferTarget = message.mentions.users.first();
         const transferAmount = args[0];
