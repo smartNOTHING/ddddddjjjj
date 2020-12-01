@@ -1,9 +1,11 @@
-const { Tags } = require('../dbObjects')
+const { Tags } = require('../dbObjects');
 
 module.exports = {
     name: 'addtag',
-    description: 'addtag',
-    async execute(args, message){
+    description: 'Add any tag you want',
+    usage: '{tag name} {tag description}',
+    args: true,
+    async execute(args, message) {
     const tagName = args.shift();
     const tagDescription = args.join(' ');
 
@@ -22,5 +24,5 @@ module.exports = {
         }
         return message.reply('Something went wrong with adding a tag');
     }
-  }
-}
+  },
+};

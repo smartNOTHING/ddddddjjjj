@@ -1,14 +1,16 @@
 module.exports = {
-    name: "leaderboard",
-    description: "leaderboard",
-    execute(args, message){
-    const { client, currency } = require('../bot')
+    name: 'leaderboard',
+    description: 'leaderboard',
+    usage: '',
+    execute(args, message) {
+    const { client } = require('../bot');
+    const { currency } = require('../models/Currency');
     return message.channel.send(
-    currency.sort((a,b) => b.balance - a.balance)
+    currency.sort((a, b) => b.balance - a.balance)
         .filter(user => client.users.cache.has(user.user_id))
         .first(10)
         .map((user, position) => `(${position + 1}) ${(client.users.cache.get(user.user_id).tag)}: $${user.balance}`)
         .join('\n'),
-    { code: true }
+    { code: true },
 );
-}}
+} };
