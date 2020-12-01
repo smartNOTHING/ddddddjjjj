@@ -3,6 +3,7 @@ const { Tags } = require('../dbObjects');
 module.exports = {
     name: 'removetag',
     description: 'removetag',
+    usage: '{tag to remove}',
     async execute(args, message) {
         const tagName = args;
         const rowCount = await Tags.destroy({ where: { name: tagName } });

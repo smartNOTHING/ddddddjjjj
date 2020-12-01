@@ -1,6 +1,7 @@
 module.exports = {
     name: 'transfer',
     description: 'transfer',
+    usage: '{amount} {mention}',
     async execute(args, message) {
         const { currency } = require('../models/Currency');
         const currentAmount = currency.getBalance(message.author.id);

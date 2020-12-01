@@ -4,6 +4,7 @@ module.exports = {
     name: 'queue',
     description: 'queue',
     aliases: ['q'],
+    usage: '',
     async execute(args, message) {
             const { serverQueue } = require('./play');
             const embed = new Discord.MessageEmbed()

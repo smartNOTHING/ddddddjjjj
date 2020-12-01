@@ -3,6 +3,7 @@ const fetch = require('node-fetch');
 module.exports = {
     name: 'gets',
     description: 'Gets Latest MC Server Version',
+    usage: '',
     execute(args, message) {
         fetch('https://launchermeta.mojang.com/mc/game/version_manifest.json')
         .then(res => res.json())

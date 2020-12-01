@@ -1,6 +1,7 @@
 module.exports = {
     name: 'balance',
     description: 'balance',
+    usage: '{mention | author}',
     async execute(args, message) {
         const { currency } = require('../models/Currency');
             const target = message.mentions.users.first() || message.author;

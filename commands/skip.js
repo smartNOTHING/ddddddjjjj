@@ -2,6 +2,7 @@ module.exports = {
     name: 'skip',
     description: 'Skip music on YTDL',
     aliases: ['s'],
+    usage: '',
     async execute(args, message) {
             const { serverQueue } = require('./play');
             if (!message.member.voice.channel) {

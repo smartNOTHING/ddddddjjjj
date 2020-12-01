@@ -4,6 +4,7 @@ const { Op } = require('sequelize');
 module.exports = {
     name: 'buy',
     description: 'buy',
+    usage: '{item}',
     async execute(args, message) {
         const { currency } = require('../models/Currency');
         const item = await CurrencyShop.findOne({ where: { name: { [Op.like]: args } } });

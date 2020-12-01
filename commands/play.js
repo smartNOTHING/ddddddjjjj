@@ -6,6 +6,7 @@ module.exports = {
     name: 'play',
     description: 'Play Music from YTDL',
     aliases: ['p'],
+    usage: '{YT Video Link | Search name}',
     async execute(args, message) {
         const voiceChannel = message.member.voice.channel;
         const serverQueue = queue.get(message.guild.id);

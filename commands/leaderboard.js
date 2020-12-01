@@ -1,6 +1,7 @@
 module.exports = {
     name: 'leaderboard',
     description: 'leaderboard',
+    usage: '',
     execute(args, message) {
     const { client } = require('../bot');
     const { currency } = require('../models/Currency');

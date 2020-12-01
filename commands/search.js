@@ -4,6 +4,7 @@ const play = require('./play');
 module.exports = {
     name: 'search',
     description: 'search',
+    usage: '{Spotify song link}',
     execute(args, message) {
 
 const clientId = '59bd11b43b17467dabb20de917c717f2',

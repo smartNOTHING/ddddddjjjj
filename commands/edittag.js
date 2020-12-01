@@ -3,6 +3,7 @@ const { Tags } = require('../dbObjects');
 module.exports = {
     name: 'edittag',
     description: 'edittag',
+    usage: '{existing tag} {new description}',
     async execute(args, message) {
     const tagName = args.shift();
     const tagDescription = args.join(' ');

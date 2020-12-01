@@ -3,6 +3,7 @@ const { Tags } = require('../dbObjects');
 module.exports = {
     name: 'tag',
     description: 'tag',
+    usage: '{tag}',
     async execute(args, message) {
         const tagName = args;
 

@@ -3,6 +3,7 @@ const { Tags } = require('../dbObjects');
 module.exports = {
     name: 'showtags',
     description: 'showtags',
+    usage: '',
     async execute(args, message) {
         const tagList = await Tags.findAll({ attributes: ['name'] });
         const tagString = tagList.map(t => t.name).join(', ') || 'No tags set.';
