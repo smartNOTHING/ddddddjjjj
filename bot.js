@@ -1,19 +1,11 @@
 const fs = require('fs');
 const Discord = require('discord.js');
 const fetch = require('node-fetch');
-const ytdl = require('ytdl-core');
-const yts = require('yt-search');
-const urlLib = require('url');
-const https = require('https');
 const config = require('./config.json');
 const prefix = config.prefix
-const { cpuUsage } = require('process');
-const { Http2ServerRequest } = require('http2');
 const queue = new Map();
 const auth = require('./auth.json');
-const tldr = require('tldr')
-const { Sequelize, Op } = require('sequelize');
-const { Users, CurrencyShop, Tags } = require('./dbObjects');
+const { Users } = require('./dbObjects');
 const currency = new Discord.Collection();
 const Keyv = require('keyv');
 
@@ -33,14 +25,6 @@ for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
     client.commands.set(command.name, command, command.description);
 }
-
-
-
-
-
-
-
-
 
 Reflect.defineProperty(currency, 'add', {
     value: async function add(id, amount) {

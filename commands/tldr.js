@@ -1,9 +1,11 @@
+
+
 module.exports = {
     name: 'tldr',
     description: 'TLDR Pages',
     usage: "[{command},--search {command}, {command} --os={os}]",
     args: true,
-    execute(message, args) {
+    execute(args, message) {
         const { exec } = require("child_process")
         const arg = args.join(' ')
 
