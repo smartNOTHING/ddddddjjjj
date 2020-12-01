@@ -5,6 +5,6 @@ module.exports = {
     description: 'shop',
     async execute(args, message) {
         const items = await CurrencyShop.findAll();
-        return message.channel.send(items.map(item => `${item.name}: $${item.cost}`).join('\n'), {code: true });
-    }
-}
+        return message.channel.send(items.map(item => `${item.name}: $${item.cost}`).join('\n'), { code: true });
+    },
+};

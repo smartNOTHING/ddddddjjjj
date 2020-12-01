@@ -2,7 +2,6 @@ const fs = require('fs');
 const Discord = require('discord.js');
 const fetch = require('node-fetch');
 const config = require('./config.json');
-const prefix = config.prefix
 const auth = require('./auth.json');
 const { Users } = require('./dbObjects');
 const currency = new Discord.Collection();
@@ -10,20 +9,18 @@ const Keyv = require('keyv');
 
 let serverQueue;
 const queue = new Map();
-module.exports= {serverQueue, queue}
-
-
+module.exports = { serverQueue, queue };
 
 
 const client = new Discord.Client();
-const prefixes = new Keyv('sqlite://database.sqlite')
+const prefixes = new Keyv('sqlite://database.sqlite');
 const globalPrefix = config.prefix;
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
-    const command = require(`./commands/${file}`);
-    client.commands.set(command.name, command, command.description);
+	const command = require(`./commands/${file}`);
+	client.commands.set(command.name, command, command.description);
 }
 
 Reflect.defineProperty(currency, 'add', {
@@ -47,8 +44,6 @@ Reflect.defineProperty(currency, 'getBalance', {
 });
 
 
-
-
 client.once('ready', async () => {
     const storedBalances = await Users.findAll();
     storedBalances.forEach(b => currency.set(b.user_id, b));
@@ -57,34 +52,33 @@ client.once('ready', async () => {
         status: 'online',
         activity: {
             name: 'YOUUUUU',
-            type: "PLAYING"
-        }
+            type: 'PLAYING',
+        },
     });
 });
 
 client.on('message', async message => {
-    module.exports = { client , currency, prefixes }
-    if(!message.guild  && !message.author.bot) {
-        console.log(`${message.author.username}: ${message.content}`)
-    }
-    
-    if (message.author.bot) return;
+    module.exports = { client, currency, prefixes };
+    if(!message.guild && !message.author.bot) {
+        console.log(`${message.author.username}: ${message.content}`);
+    } if (message.author.bot) return;
     currency.add(message.author.id, 1);
 
     let args;
+    let prefix;
     if (message.guild) {
-        let prefix;
-
         if (message.content.startsWith(globalPrefix)) {
             prefix = globalPrefix;
-        } else {
+        }
+        else {
             const guildPrefix = await prefixes.get(message.guild.id);
             if (message.content.startsWith(guildPrefix)) prefix = guildPrefix;
         }
 
         if (!prefix) return;
         args = message.content.slice(prefix.length).trim().split(/\s+/);
-    } else {
+    }
+    else {
         const slice = message.content.startsWith(globalPrefix) ? globalPrefix.length : 0;
         args = message.content.slice(slice).split(/\s+/);
     }
@@ -93,28 +87,22 @@ client.on('message', async message => {
     const command = client.commands.get(commandName)
         || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
 
-    const serverQueue = "";
-
-    
 
     if (command.args && !args.length) {
-        let reply = `You didnt provide any arugments, ${message.author}`
+        let reply = `You didnt provide any arugments, ${message.author}`;
 
         if (command.usage) {
             reply += `\nThe proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
         }
         return message.channel.send(reply);
-    } else
-    
-    try {
+    } try {
         command.execute(args, message, fs, fetch, globalPrefix);
-        
-    } catch (error) {
+    }
+    catch (error) {
         console.error(error);
         message.reply('there was an error trying to execute that command!');
     }
 });
-
 
 
 client.login(auth.token);

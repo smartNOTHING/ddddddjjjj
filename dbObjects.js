@@ -23,7 +23,6 @@ Users.prototype.addItem = async function(item) {
         userItem.amount += 1;
         return userItem.save();
     }
-    
     return UserItems.create({ user_id: this.user_id, item_id: item.id, amount: 1 });
 };
 
@@ -34,4 +33,4 @@ Users.prototype.getItems = function() {
     });
 };
 
-module.exports = {Users, CurrencyShop, UserItems, Tags };
+module.exports = { Users, CurrencyShop, UserItems, Tags };
