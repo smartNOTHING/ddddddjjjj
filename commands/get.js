@@ -3,7 +3,7 @@ const { http } = require("winston");
 module.exports = {
     name: 'gets',
     description: 'Gets Latest MC Server Version',
-    execute(message, args, fs, fetch){
+    execute(args, message, fs, fetch){
         fetch('https://launchermeta.mojang.com/mc/game/version_manifest.json')
         .then(res => res.json())
         .then(function(json) {
