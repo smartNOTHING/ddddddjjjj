@@ -1,14 +1,15 @@
 const ytdl = require('ytdl-core');
 const yts = require('yt-search')
-const { queue } = require('../bot')
+const { queue, serverQueue } = require('../bot')
 
 module.exports = {
     name: "play",
     description: "Play Music from YTDL",
     aliases: ["p"],
-    async execute(args, message, fs, fetch, client, serverQueue) {
+    async execute(args, message, fs, fetch, globalPrefix) {
         
         const voiceChannel = message.member.voice.channel;
+        const serverQueue = queue.get(message.guild.id)
 
         if (!voiceChannel) 
             return message.channel.send(

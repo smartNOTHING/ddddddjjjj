@@ -3,19 +3,19 @@ const Discord = require('discord.js');
 const fetch = require('node-fetch');
 const config = require('./config.json');
 const prefix = config.prefix
-const queue = new Map();
 const auth = require('./auth.json');
 const { Users } = require('./dbObjects');
 const currency = new Discord.Collection();
 const Keyv = require('keyv');
 
-
+let serverQueue;
+const queue = new Map();
+module.exports= {serverQueue, queue}
 
 
 
 
 const client = new Discord.Client();
-module.exports = { queue }
 const prefixes = new Keyv('sqlite://database.sqlite')
 const globalPrefix = config.prefix;
 client.commands = new Discord.Collection();
@@ -95,9 +95,6 @@ client.on('message', async message => {
 
     const serverQueue = "";
 
-    if (message.guild) {
-        const serverQueue = message.guild.id
-    }
     
 
     if (command.args && !args.length) {
