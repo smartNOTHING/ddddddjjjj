@@ -1,23 +1,6 @@
-const fs = require('fs');
-const Discord = require('discord.js');
-const config = require('./config.json');
-const auth = require('./auth.json');
+const { client, prefixes, globalPrefix, auth } = require('./client/Client');
 const { Users } = require('./dbObjects');
 const { currency } = require('./models/Currency');
-const Keyv = require('keyv');
-
-
-const client = new Discord.Client();
-const prefixes = new Keyv('sqlite://database.sqlite');
-const globalPrefix = config.prefix;
-
-client.commands = new Discord.Collection();
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-
-for (const file of commandFiles) {
-	const command = require(`./commands/${file}`);
-	client.commands.set(command.name, command, command.description);
-}
 
 client.once('ready', async () => {
     const storedBalances = await Users.findAll();
@@ -62,8 +45,10 @@ client.on('message', async message => {
     const command = client.commands.get(commandName)
         || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
 
-
-    if (command.args && !args.length) {
+    if (command.admin && !message.member.hasPermission('ADMINISTRATOR')) {
+        return message.reply('you dont have permission to use this command');
+    }
+    else if (command.args && !args.length) {
         let reply = `You didnt provide any arugments, ${message.author}`;
 
         if (command.usage) {
@@ -71,7 +56,7 @@ client.on('message', async message => {
         }
         return message.channel.send(reply);
     } try {
-        command.execute(args, message, fs, globalPrefix);
+        command.execute(args, message, globalPrefix);
     }
     catch (error) {
         console.error(error);

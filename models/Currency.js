@@ -22,4 +22,4 @@ Reflect.defineProperty(currency, 'getBalance', {
     },
 });
 
-module.exports = { currency }
+module.exports = { currency };
