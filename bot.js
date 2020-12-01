@@ -62,8 +62,10 @@ client.on('message', async message => {
     const command = client.commands.get(commandName)
         || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
 
-
-    if (command.args && !args.length) {
+    if (command.admin && !message.member.hasPermission('ADMINISTRATOR')) {
+        return message.reply('you dont have permission to use this command');
+    }
+    else if (command.args && !args.length) {
         let reply = `You didnt provide any arugments, ${message.author}`;
 
         if (command.usage) {
