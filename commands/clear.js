@@ -3,7 +3,7 @@ module.exports = {
     args: true,
     usage: 'number of messages to delete',
     description: 'Clear',
-    async execute(message, args) {
+    async execute(args, message) {
         const amount = args.join(' ');
 
         if (!amount) return message.reply('You have to specify an amount!');

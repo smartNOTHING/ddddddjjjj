@@ -1,8 +1,10 @@
+const SpotifyWebApi = require('spotify-web-api-node')
+const play = require('./play')
+
 module.exports = {
     name: 'search',
     description: 'search',
-    execute(message, args) {
-        var SpotifyWebApi = require('spotify-web-api-node')
+    execute(args, message) {
 
 var clientId= '59bd11b43b17467dabb20de917c717f2',
     clientSecret = 'bc28866ed8254af994743f18d88eaf15';
@@ -18,12 +20,14 @@ spotifyApi.clientCredentialsGrant().then(
         console.log('The access token is ' + data.body['access_token']);
         spotifyApi.setAccessToken(data.body['access_token']);
         const ac = data.body['access_token']
+        const search = args.join().slice(31, 53)
+        console.log(search)
 
-        spotifyApi.searchTracks(`track:${args}`).then(
+        spotifyApi.getTrack(search).then(
             function(data) {
-                for (key in data.body.tracks.items){
-                    console.log(data.body.tracks.items[key])
-                }
+                const args = data.body.name.split(/\s+/)
+                
+                play.execute(args, message)
             },
             function(err){
                 console.log('Something went wrong!', err);
