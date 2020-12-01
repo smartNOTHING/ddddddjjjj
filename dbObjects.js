@@ -10,6 +10,7 @@ const sequelize = new Sequelize('database', 'username', 'password', {
 const Users = require('./models/Users')(sequelize, Sequelize.DataTypes);
 const CurrencyShop = require('./models/CurrencyShop')(sequelize, Sequelize.DataTypes);
 const UserItems = require('./models/UserItems')(sequelize, Sequelize.DataTypes);
+const Tags = require('./models/Tags')(sequelize, Sequelize.DataTypes);
 
 UserItems.belongsTo(CurrencyShop, { foreignKey: 'item_id', as: 'item' });
 
@@ -33,4 +34,4 @@ Users.prototype.getItems = function() {
     });
 };
 
-module.exports = {Users, CurrencyShop, UserItems };
+module.exports = {Users, CurrencyShop, UserItems, Tags };
