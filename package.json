@@ -10,9 +10,11 @@
     "canvas": "^2.6.1",
     "discord.io": "https://github.com/woor/discord.io/tarball/gateway_v6",
     "discord.js": "^12.5.1",
+    "distube": "^2.8.6",
     "eslint": "^7.14.0",
     "ffmpeg": "0.0.4",
     "ffmpeg-static": "^4.2.7",
+    "https-proxy-agent": "^5.0.0",
     "keyv": "^4.0.3",
     "node-fetch": "^2.6.1",
     "sequelize": "^6.3.5",
@@ -22,7 +24,8 @@
     "sqlite3": "^5.0.0",
     "tldr": "^3.3.5",
     "winston": "^3.3.3",
-    "yt-search": "^2.5.0",
-    "ytdl-core": "^4.1.1"
+    "yt-search": "^2.5.1",
+    "ytdl-core": "^4.1.1",
+    "ytsr": "^1.0.4"
   }
 }

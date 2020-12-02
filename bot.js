@@ -1,7 +1,10 @@
 const { client, prefixes, globalPrefix, auth } = require('./client/Client');
-const { applyImage } = require('./client/joinimage')
+const { applyImage } = require('./client/joinimage');
 const { Users } = require('./dbObjects');
 const { currency } = require('./models/Currency');
+const DisTube = require('distube');
+
+client.distube = new DisTube(client, { searchSongs: true, emitNewSongOnly: true, leaveOnFinish: true });
 
 client.once('ready', async () => {
     const storedBalances = await Users.findAll();
@@ -54,6 +57,8 @@ client.on('message', async message => {
     const command = client.commands.get(commandName)
         || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
 
+    if (!command) return;
+
     if (command.admin && !message.member.hasPermission('ADMINISTRATOR')) {
         return message.reply('you dont have permission to use this command');
     }
@@ -72,6 +77,28 @@ client.on('message', async message => {
         message.reply('there was an error trying to execute that command!');
     }
 });
+
+const status = (queue) => `Volume: \`${queue.volume}%\` | Filter: \`${queue.filter || "Off"}\` | Loop: \`${queue.repeatMode ? queue.repeatMode == 2 ? "All Queue" : "This Song" : "Off"}\` | Autoplay: \`${queue.autoplay ? "On" : "Off"}\``;
+
+client.distube
+    .on('playSong', (message, queue, song) => message.channel.send(
+        `Playing \`${song.name}\` - \`${song.formattedDuration}\` \nRequested by: ${song.user}`,
+    ))
+    .on('addSong', (message, queue, song) => message.channel.send(
+        `Added ${song.name} - \`${song.formattedDuration}\` to the queue by ${song.user}`,
+    ))
+    .on('playList', (message, queue, playlist, song) => message.channel.send(
+        `Play \`${playlist.title}\` playlist (${playlist.total_items} songs). \nRequested by: ${song.user}\nNow`,
+    ))
+    .on('addList', (message, queue, playlist) => message.channel.send(
+        `Added \`${playlist.title}\` playlist (${playlist.total_items} songs). to queue\n${status(queue)}`,
+    ))
+    .on('searchResult', (message, result) => {
+        let i = 0;
+        message.channel.send(`**Choose an option from below**\n${result.map(song => `**${++i}**. ${song.name} - \`${song.formattedDuration}\``).join('\n')}\n*Enter anything else or wait 60 seconds to cancel*`);
+    })
+    .on('searchCancel', (message) => message.channel.send('Searching Cancelled'))
+    .on('error', (message, err) => message.channel.send(`An error has encountered: ${err}`));
 
 
 client.login(auth.token);
