@@ -43,5 +43,3 @@ module.exports = {
             message.channel.send(embed);
     },
 };
-
-/* Test */
