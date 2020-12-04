@@ -5,7 +5,8 @@ module.exports = {
     args: true,
     admin: true,
     async execute(args, message) {
-        const getUserFromMention = require('./getUserFromMention');
+        const req = require('./getUserFromMention');
+        const getUserFromMention = req.getUserFromMention;
 
         if (args.length < 2) {
             return message.reply('Please mention the user you want to ban and specify a reason');
