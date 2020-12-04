@@ -1,16 +1,16 @@
 module.exports = {
     name: 'stop',
-    description: 'Stop music on YTDL',
+    description: 'stop',
     aliases: ['st'],
     usage: '',
     async execute(args, message) {
-        const { serverQueue } = require('./play');
-        if (!message.member.voice.channel) {
-          return message.channel.send(
-            'You have to be in a voice channel to stop the music!',
-          );
-        }
-        serverQueue.songs = [];
-        serverQueue.connection.dispatcher.end();
-      },
-};
+        const player = message.client.manager.get(message.guild.id);
+        const { channel } = message.member.voice;
+
+        if (!channel) return message.repy('You need to be in a voice channel.');
+        if (channel.id !== player.voiceChannel) return message.reply('Youre not in the same voice channel');
+
+        player.destroy();
+        return message.reply('Stopped the player!');
+        },
+    };

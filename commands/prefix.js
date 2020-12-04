@@ -2,6 +2,7 @@ module.exports = {
     name: 'prefix',
     description: 'Set or display prefix',
     usage: '{prefix | or no args to display current prefix}',
+    admin: true,
     async execute(args, message, globalPrefix) {
         const { prefixes } = require('../bot');
         if (args.length) {

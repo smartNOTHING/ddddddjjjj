@@ -1,18 +1,21 @@
 module.exports = {
     name: 'skip',
-    description: 'Skip music on YTDL',
+    description: 'skip',
     aliases: ['s'],
     usage: '',
-    async execute(args, message) {
-            const { serverQueue } = require('./play');
-            if (!message.member.voice.channel) {
-              return message.channel.send(
-                'You have to be in a voice channel to stop the music!',
-              );
-            }
-            if (!serverQueue) {
-              return message.channel.send('There is no song that I could skip!');
-            }
-            serverQueue.connection.dispatcher.end();
+    execute(args, message) {
+        const player = message.client.manager.get(message.guild.id);
+        if (!player) return message.reply('There is no player for this guild');
+
+        const{ channel } = message.member.voice;
+        if (!channel) return message.reply('You need to join a voice channel.');
+        if (channel.id !== player.voiceChannel) return message.reply('Youre not in the same voice channel as the bot');
+
+        if (!player.queue.current) return message.reply('There is no music playing');
+
+        const { title } = player.queue.current;
+
+        player.stop();
+        return message.reply(`${title} was skipped`);
     },
 };

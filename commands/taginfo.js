@@ -1,4 +1,5 @@
 const { Tags } = require('../dbObjects');
+const { Op } = require('sequelize');
 
 module.exports = {
     name: 'taginfo',
@@ -7,7 +8,7 @@ module.exports = {
     async execute(args, message) {
         const tagName = args;
 
-        const tag = await Tags.findOne({ where: { name: tagName } });
+        const tag = await Tags.findOne({ where: { name: { [Op.like]: tagName } } });
         if (tag) {
             return message.channel.send(`${tagName} was created by ${tag.username} at ${tag.createdAt} and has been used ${tag.usage_count} times`)
         }
