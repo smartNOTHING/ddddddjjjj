@@ -4,7 +4,6 @@ module.exports = {
     usage: '',
     aliases: ['p'],
     async execute(args, message) {
-        const { client } = require('../bot');
         const { channel } = message.member.voice;
 
         if (!channel) return message.reply('you need to join a voice channel.');
@@ -27,7 +26,8 @@ module.exports = {
             if (!player.queue.current) player.destroy();
             throw res.exception;
           }
-        } catch (err) {
+        }
+        catch (err) {
           return message.reply(`there was an error while searching: ${err.message}`);
         }
 
@@ -38,8 +38,8 @@ module.exports = {
           case 'TRACK_LOADED':
             player.queue.add(res.tracks[0]);
 
-            if (!player.playing && !player.paused && !player.queue.size) player.play();
-            return message.reply(`enqueuing \`${res.tracks[0].title}\`.`);
+            if (!player.playing && !player.paused && !player.queue.size) return player.play();
+            return message.reply(`Adding \`${res.tracks[0].title}\` to the queue.`);
           case 'PLAYLIST_LOADED':
             player.queue.add(res.tracks);
 
@@ -58,7 +58,8 @@ module.exports = {
 
             try {
               collected = await message.channel.awaitMessages(filter, { max: 1, time: 30e3, errors: ['time'] });
-            } catch (e) {
+            }
+            catch (e) {
               if (!player.queue.current) player.destroy();
               return message.reply('you didn\'t provide a selection.');
             }
@@ -76,8 +77,8 @@ module.exports = {
             const track = res.tracks[index];
             player.queue.add(track);
 
-            if (!player.playing && !player.paused && !player.queue.size) player.play();
-            return message.reply(`enqueuing \`${track.title}\`.`);
+            if (!player.playing && !player.paused && !player.queue.size) return player.play();
+            return message.reply(`adding \`${track.title}\` to the queue.`);
         }
     },
 };

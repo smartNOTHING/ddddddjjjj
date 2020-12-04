@@ -11,7 +11,8 @@ module.exports = {
 
         const queue = player.queue;
         const embed = new MessageEmbed()
-          .setAuthor(`Queue for ${message.guild.name}`);
+          .setAuthor(`Queue for ${message.guild.name}`)
+          .setColor(0xff0000);
 
         // change for the amount of tracks per page
         const multiple = 10;
@@ -21,7 +22,6 @@ module.exports = {
         const start = end - multiple;
 
         const tracks = queue.slice(start, end);
-
         if (queue.current) embed.addField('Current', `[${queue.current.title}](${queue.current.uri})`);
 
         if (!tracks.length) embed.setDescription(`No tracks in ${page > 1 ? `page ${page}` : 'the queue'}.`);

@@ -13,7 +13,7 @@ module.exports = {
         }
         const anon = args.join(' ');
         const embed = new Discord.MessageEmbed()
-        .setAuthor(message.author.tag, message.author.displayAvatarURL(), 'https://ghf.synyster.org/')
+        .setAuthor(message.author.tag, message.author.displayAvatarURL(), message.author.displayAvatarURL())
         .setColor(0xff0000)
         .setTimestamp()
         .setTitle('Announcement')

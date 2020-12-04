@@ -2,7 +2,8 @@ module.exports = {
     name: 'volume',
     description: 'voulme',
     usage: '',
-    execute(message, args) {
+    aliases: ['vol', 'v'],
+    execute(args, message) {
       const player = message.client.manager.get(message.guild.id);
 
       if (!player) return message.reply('there is no player for this guild.');

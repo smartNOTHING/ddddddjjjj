@@ -111,7 +111,7 @@ client.on('message', async message => {
     }
 
      try {
-        command.execute(args, message, globalPrefix);
+        command.execute(args, message, prefix, globalPrefix);
     }
     catch (error) {
         console.error(error);

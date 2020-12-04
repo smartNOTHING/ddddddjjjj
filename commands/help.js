@@ -1,35 +1,45 @@
 const Discord = require('discord.js');
-const fs = require('fs');
 
 module.exports = {
     name: 'help',
     description: 'Displays this message',
     usage: '',
-    execute(args, message) {
-        const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+    async execute(args, message, prefix) {
         const embed = new Discord.MessageEmbed()
         .setTitle('Help')
         .setColor(0xff0000);
-    if (!args[0]) {
-        for (const file of commandFiles) {
-            const fileName = require(`./${file}`);
-            if (!fileName.usage.length) {
-            embed.addField(fileName.name, fileName.description);
-            }
-            else {embed.addField(fileName.name, fileName.usage);}
-        }
-    }
-        else {
-        for (const file of commandFiles) {
-            const fileName = require(`./${file}`);
-            if (args[0] == fileName.name) {
-                if (!fileName.usage.length) {
-            embed.addField(fileName.name, fileName.description);
+        const { client } = require('../bot');
+        const command = Array.from(client.commands);
+        const array = [];
+
+        const multiple = 10;
+        const page = args.length && Number(args[0]) ? Number(args[0]) : 1;
+
+        const end = page * multiple;
+        const start = end - multiple;
+
+
+            for(const i in command) {
+                if(!command[i][1].usage.length) {
+                    await array.push([{ name: command[i][1].name }, { desc: command[i][1].description }]);
                 }
-                else {embed.addField(fileName.name, fileName.usage);}
+                else {
+                    await array.push([{ name: command[i][1].name }, { desc: command[i][1].usage }]);
+                }
             }
-        }
-    }
-      message.channel.send(embed);
+            const coms = array.slice(start, end);
+            const maxPages = Math.ceil(array.length / multiple);
+            if(!coms.length) return message.reply(`There is no page ${page}`);
+            for(let i in coms) {
+                let inline;
+                const name = `${prefix}${coms[i][0].name}`;
+                const value = coms[i][1].desc;
+                embed.addFields(
+                    { name, value, inline },
+                );
+                embed.setFooter(`Page ${page > maxPages ? maxPages : page} of ${maxPages}`);
+            }
+            console.log(embed);
+            message.channel.send(embed);
     },
 };

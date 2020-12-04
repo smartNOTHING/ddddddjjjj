@@ -1,6 +1,6 @@
 module.exports = {
     name: 'repeat',
-    descriptions: 'repeat',
+    description: 'repeat',
     aliases: ['r'],
     usage: '',
     execute(args, message) {
