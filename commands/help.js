@@ -30,10 +30,16 @@ module.exports = {
             const coms = array.slice(start, end);
             const maxPages = Math.ceil(array.length / multiple);
             if(!coms.length) return message.reply(`There is no page ${page}`);
-            for(const i in coms) {
-                embed.addField(`${prefix}${coms[i][0].name}`, coms[i][1].desc);
+            for(let i in coms) {
+                let inline;
+                const name = `${prefix}${coms[i][0].name}`;
+                const value = coms[i][1].desc;
+                embed.addFields(
+                    { name, value, inline },
+                );
                 embed.setFooter(`Page ${page > maxPages ? maxPages : page} of ${maxPages}`);
             }
+            console.log(embed);
             message.channel.send(embed);
     },
 };
