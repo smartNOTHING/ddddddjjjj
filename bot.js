@@ -1,13 +1,7 @@
-const { prefixes, globalPrefix } = require('./client/Client');
 const { client } = require('./client/manager');
-const { applyImage } = require('./client/joinimage');
-const { Users } = require('./dbObjects');
-const { currency } = require('./models/Currency');
 
 
 client.once('ready', async () => {
-    const storedBalances = await Users.findAll();
-    storedBalances.forEach(b => currency.set(b.user_id, b));
     console.log('Ready!');
     console.log(`Logged in as ${client.user.tag}`);
     client.user.setPresence({
@@ -18,33 +12,23 @@ client.once('ready', async () => {
         },
     });
     client.manager.init(client.user.id);
-    const channel = client.channels.cache.find(ch => ch.name === 'bot-activity');
-    if (!channel) return console.log('\nNo bot activity channel\n');
-    channel.send('Im online!');
-});
-
-
-client.on('guildMemberAdd', async (member) => {
-    applyImage(member);
-    return;
 });
 
 client.on('message', async message => {
     if (message.author.bot) return;
-    currency.add(message.author.id, 1);
 
-    module.exports = { client, currency, prefixes };
+    module.exports = { client };
 
 
     let args;
     let prefix;
 
     if (message.guild) {
-        if (message.content.startsWith(globalPrefix)) {
-            prefix = globalPrefix;
+        if (message.content.startsWith(client.globalPrefix)) {
+            prefix = client.globalPrefix;
         }
         else {
-            const guildPrefix = await prefixes.get(message.guild.id);
+            const guildPrefix = await client.prefixes.get(message.guild.id);
             if (message.content.startsWith(guildPrefix)) prefix = guildPrefix;
         }
 
@@ -52,7 +36,7 @@ client.on('message', async message => {
         args = message.content.slice(prefix.length).trim().split(/\s+/);
     }
     else {
-        const slice = message.content.startsWith(globalPrefix) ? globalPrefix.length : 0;
+        const slice = message.content.startsWith(client.globalPrefix) ? client.globalPrefix.length : 0;
         args = message.content.slice(slice).split(/\s+/);
     }
 
@@ -76,7 +60,7 @@ client.on('message', async message => {
     }
 
      try {
-        command.execute(args, message, prefix, globalPrefix);
+        command.execute(args, message, prefix, client.globalPrefix);
     }
     catch (error) {
         console.error(error);
