@@ -1,46 +1,9 @@
-const { client, prefixes, globalPrefix, auth } = require('./client/Client');
+const { prefixes, globalPrefix } = require('./client/Client');
+const { client } = require('./client/manager');
 const { applyImage } = require('./client/joinimage');
 const { Users } = require('./dbObjects');
 const { currency } = require('./models/Currency');
-const { Manager } = require('erela.js');
-const Spotify = require('erela.js-spotify');
 
-const clientID = '59bd11b43b17467dabb20de917c717f2';
-const clientSecret = 'bc28866ed8254af994743f18d88eaf15';
-
-client.manager = new Manager({
-    nodes: [
-        {
-            host: 'localhost',
-            port: 2333,
-            password: 'youshallnotpass',
-        },
-    ],
-    plugins: [
-        new Spotify({
-            clientID,
-            clientSecret,
-        }),
-    ],
-    send(id, payload) {
-        const guild = client.guilds.cache.get(id);
-        if (guild) guild.shard.send(payload);
-    },
-})
-    .on('nodeConnect', node => console.log(`Node ${node.options.identifier} connected`))
-    .on('nodeError', (node, error) => console.log(`Node ${node.options.identifier} has had an error ${error}`))
-    .on('trackStart', (player, track) => {
-        client.channels.cache
-            .get(player.textChannel)
-            .send(`Now playing: ${track.title}`);
-    })
-    .on('queueEnd', (player) => {
-        client.channels.cache
-            .get (player.textChannel)
-            .send('Queue has ended.');
-
-        player.destroy();
-    });
 
 client.once('ready', async () => {
     const storedBalances = await Users.findAll();
@@ -55,9 +18,11 @@ client.once('ready', async () => {
         },
     });
     client.manager.init(client.user.id);
+    const channel = client.channels.cache.find(ch => ch.name === 'bot-activity');
+    if (!channel) return console.log('\nNo bot activity channel\n');
+    channel.send('Im online!');
 });
 
-client.on('raw', (d) => client.manager.updateVoiceState(d));
 
 client.on('guildMemberAdd', async (member) => {
     applyImage(member);
@@ -119,4 +84,4 @@ client.on('message', async message => {
     }
 });
 
-client.login(auth.token);
+client.login(client.auth.token);
