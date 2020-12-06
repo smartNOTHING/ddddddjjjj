@@ -55,6 +55,9 @@ client.once('ready', async () => {
         },
     });
     client.manager.init(client.user.id);
+    const channel = client.channels.cache.find(ch => ch.name === 'bot-activity');
+    if (!channel) return console.log('\nNo bot activity channel\n');
+    channel.send('Im online!');
 });
 
 client.on('raw', (d) => client.manager.updateVoiceState(d));

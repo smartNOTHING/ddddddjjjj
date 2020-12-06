@@ -39,7 +39,6 @@ module.exports = {
                 );
                 embed.setFooter(`Page ${page > maxPages ? maxPages : page} of ${maxPages}`);
             }
-            console.log(embed);
             message.channel.send(embed);
     },
 };
