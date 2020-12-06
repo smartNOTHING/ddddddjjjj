@@ -21,6 +21,7 @@
     "keyv": "^4.0.3",
     "lavalink": "^2.10.2",
     "node-fetch": "^2.6.1",
+    "pretty-ms": "^7.0.1",
     "sequelize": "^6.3.5",
     "soundcloud-audio": "^1.4.0",
     "spotify-url-info": "^2.2.0",

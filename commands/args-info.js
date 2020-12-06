@@ -4,7 +4,7 @@ module.exports = {
     description: 'args-info',
     usage: '{args}',
     args: true,
-    execute(message, args) {
+    execute(args, message) {
         if(args[0] === 'foo') {
             return message.channel.send('bar');
         }
