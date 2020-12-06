@@ -1,4 +1,3 @@
-const { prefixes, globalPrefix } = require('./client/Client');
 const { client } = require('./client/manager');
 const { applyImage } = require('./client/joinimage');
 const { Users } = require('./dbObjects');
@@ -33,18 +32,18 @@ client.on('message', async message => {
     if (message.author.bot) return;
     currency.add(message.author.id, 1);
 
-    module.exports = { client, currency, prefixes };
+    module.exports = { client, currency };
 
 
     let args;
     let prefix;
 
     if (message.guild) {
-        if (message.content.startsWith(globalPrefix)) {
-            prefix = globalPrefix;
+        if (message.content.startsWith(client.globalPrefix)) {
+            prefix = client.globalPrefix;
         }
         else {
-            const guildPrefix = await prefixes.get(message.guild.id);
+            const guildPrefix = await client.prefixes.get(message.guild.id);
             if (message.content.startsWith(guildPrefix)) prefix = guildPrefix;
         }
 
@@ -52,7 +51,7 @@ client.on('message', async message => {
         args = message.content.slice(prefix.length).trim().split(/\s+/);
     }
     else {
-        const slice = message.content.startsWith(globalPrefix) ? globalPrefix.length : 0;
+        const slice = message.content.startsWith(client.globalPrefix) ? client.globalPrefix.length : 0;
         args = message.content.slice(slice).split(/\s+/);
     }
 
@@ -76,7 +75,7 @@ client.on('message', async message => {
     }
 
      try {
-        command.execute(args, message, prefix, globalPrefix);
+        command.execute(args, message, prefix, client.globalPrefix);
     }
     catch (error) {
         console.error(error);

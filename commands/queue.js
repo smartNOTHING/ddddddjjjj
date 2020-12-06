@@ -23,7 +23,8 @@ module.exports = {
         const start = end - multiple;
 
         const tracks = queue.slice(start, end);
-        if (queue.current) embed.addField('Current', `[${queue.current.title}](${queue.current.uri}) - ${pms(queue.current.duration, { compact: true })}`);
+        const remain = queue.current.duration - player.position;
+        if (queue.current) embed.addField('Current', `[${queue.current.title}](${queue.current.uri}) - Time Remaining: ${pms(remain)}`);
 
         if (!tracks.length) embed.setDescription(`No tracks in ${page > 1 ? `page ${page}` : 'the queue'}.`);
         else embed.setDescription(tracks.map((track, i) => `${start + (++i)} - [${track.title}](${track.uri}) - ${pms(track.duration, { compact: true })}`).join('\n'));

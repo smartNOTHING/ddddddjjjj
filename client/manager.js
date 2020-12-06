@@ -36,7 +36,8 @@ client.manager = new Manager({
             .setDescription(`[${track.title}](${track.uri})`)
             .setAuthor(req.user.tag, req.user.displayAvatarURL())
             .setFooter(guild, guild.iconURL())
-            .setTimestamp();
+            .setTimestamp()
+            .setThumbnail(track.thumbnail);
         client.channels.cache.get(player.textChannel).send(embed).then(m => m.delete({ timeout: track.duration }));
     })
     .on('queueEnd', (player) => {
@@ -52,4 +53,4 @@ client.manager = new Manager({
 
 client.on('raw', (d) => client.manager.updateVoiceState(d));
 
-module.exports = { client }
+module.exports = { client };
