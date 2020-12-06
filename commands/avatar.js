@@ -1,3 +1,5 @@
+const { MessageEmbed } = require('discord.js');
+
 module.exports = {
     name: 'avatar',
     aliases: ['icon', 'pfp'],
@@ -5,11 +7,24 @@ module.exports = {
     usage: '{mention | no mention for self}',
     execute(args, message) {
 
-        const member = message.mentions.users.first();
+        let member;
         if (args[0]) {
+            member = message.mentions.users.first();
             if (!member) return message.reply('You need to specify a user');
-        return message.channel.send(`${member.username}'s avatar: ${member.displayAvatarURL({ dynamic: true })}`);
+            const embed = new MessageEmbed()
+            .setTitle(`Avatar for ${member.tag}`)
+            .setColor(0xff0000)
+            .setImage(member.displayAvatarURL({ dynamic: true, size: 512 }));
+        return message.channel.send(embed);
     }
-    return message.channel.send(`${message.author.username}, your avatar: ${message.author.displayAvatarURL({ dynamic: true })}`);
+        else {
+             member = message.author;
+             const embed = new MessageEmbed()
+             .setTitle(`Avatar for ${member.tag}`)
+             .setColor(0xff0000)
+             .setImage(member.displayAvatarURL({ dynamic: true, size: 512 }));
+        return message.channel.send(embed);
+    }
+
     },
 };
