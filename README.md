@@ -16,10 +16,16 @@ and change the file name to 'auth.json', at that point you
 can run 'node bot.js' and the bot will run.
 
 Make Sure you have the latest Python 2 and 3, Node v12 or up,
-and install Canvas and Sqlite3 manually if needed.
+JDK 12 or up, and install Canvas and Sqlite3 manually if needed.
 
 IF ON LINUX, YOU NEED TO INSTALL MAKE, GCC, AND G++ IF YOU HAVENT
 ALREADY, For Debian based distros: `sudo apt install make gcc g++`
+
+OpenJDK Install (for Debian Based Linux):
+`sudo add-apt-repository ppa:openjdk-r/ppa`
+`sudo apt update`
+`sudo apt install openjdk-12-jdk`
+
 
 If you want to make changes to the code , but have the bot 
 restart every time you save changes , install nodemon with
