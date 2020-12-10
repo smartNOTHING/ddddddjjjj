@@ -38,13 +38,13 @@ module.exports = {
           case 'TRACK_LOADED':
             player.queue.add(res.tracks[0]);
 
-            if (!player.playing && !player.paused && !player.queue.size) player.play();
+            if (!player.playing && !player.paused && !player.queue.size) return player.play();
             return message.reply(`Adding \`${res.tracks[0].title}\` to the queue.`);
           case 'PLAYLIST_LOADED':
             player.queue.add(res.tracks);
 
             if (!player.playing && !player.paused && player.queue.totalSize === res.tracks.length) player.play();
-            return message.reply(`enqueuing playlist \`${res.playlist.name}\` with ${res.tracks.length} tracks.`);
+            return message.reply(`Adding playlist \`${res.playlist.name}\` with ${res.tracks.length} tracks to the queue.`);
           case 'SEARCH_RESULT':
             let max = 5, collected, filter = (m) => m.author.id === message.author.id && /^(\d+|end)$/i.test(m.content);
             if (res.tracks.length < max) max = res.tracks.length;
@@ -77,7 +77,7 @@ module.exports = {
             const track = res.tracks[index];
             player.queue.add(track);
 
-            if (!player.playing && !player.paused && !player.queue.size) player.play();
+            if (!player.playing && !player.paused && !player.queue.size) return player.play();
             return message.reply(`adding \`${track.title}\` to the queue.`);
         }
     },

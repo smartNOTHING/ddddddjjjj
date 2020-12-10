@@ -17,6 +17,8 @@
     "eslint": "^7.14.0",
     "ffmpeg": "0.0.4",
     "ffmpeg-static": "^4.2.7",
+    "genius-lyrics-api": "^3.0.3",
+    "got": "^11.8.0",
     "https-proxy-agent": "^5.0.0",
     "keyv": "^4.0.3",
     "lavalink": "^2.10.2",

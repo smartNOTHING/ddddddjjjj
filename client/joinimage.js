@@ -26,7 +26,7 @@ const applyImage = async (member) => {
     const ctx = canvas.getContext('2d');
 
 
-    const background = await Canvas.loadImage('./canvas2.jpg');
+    const background = await Canvas.loadImage('./canvas3.jpeg');
 
     ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 
