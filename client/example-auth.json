@@ -2,6 +2,7 @@
     "token":"Discord Bot Token goes here",
     "apikeys": {
         "spotifyID":"Spotify Client ID goes here",
-        "spotifySecret":"Spotify Client Secret goes here"
+        "spotifySecret":"Spotify Client Secret goes here",
+        "geniusToken":"Genius API Token goes here"
     }
 }

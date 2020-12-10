@@ -7,10 +7,12 @@ module.exports = {
     usage: '',
     args: true,
     async execute(args, message) {
+        const { client } = require('../bot');
+        const TOKEN = client.auth.apikeys.geniusToken;
         const ARTIST = args[0];
         const TITLE = args.slice(1).join(' ');
         const options = {
-            apiKey: 'NuJ5nkRz17pGQRKTKWql9Vj4oFOfoD3HWmp1dL5WJD-UY5qqy3HwPPOuFKunvEGr',
+            apiKey: TOKEN,
             title: TITLE,
             artist: ARTIST,
             optimizeQuery: true,
