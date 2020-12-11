@@ -7,13 +7,27 @@ module.exports = {
     usage: '',
     args: true,
     async execute(args, message) {
-        if(!args.includes('-')) return message.reply('You must put the artist name first, and you must have a hyphon inbetween the artist and song name');
+        let queue;
+        const player = message.client.manager.get(message.guild.id);
+        if (player) {
+            queue = player.queue;
+        }
+        let arg;
+        if(args[0] === 'np') {
+            if (!queue.current.title.includes(' - ')) return message.reply('Song Title does not have a hyphon, i cannot parse this track!');
+            arg = `${queue.current.title}`;
+        }
+        else {
+            arg = args.join(' ');
+        }
+        if(!arg.includes('-')) return message.reply('You must put the artist name first, and you must have a hyphon inbetween the artist and song name');
+
+
         const { client } = require('../bot');
         const TOKEN = client.auth.apikeys.geniusToken;
-        const split = args.join(' ').split('-');
+        const split = arg.split('-');
         const ARTIST = split[0];
         const TITLE = split[1];
-        const PAGENUM = split[2];
 
 
         const options = {
@@ -25,7 +39,7 @@ module.exports = {
 
         getSong(options).then((song) => {
             const multiple = 2048;
-            let page = args.length && Number(PAGENUM) ? Number(PAGENUM) : 1;
+            let page = 1;
 
             const end = page * multiple;
             const start = end - multiple;
@@ -33,12 +47,13 @@ module.exports = {
             const lyrics = song.lyrics.slice(start, end);
             const maxPages = Math.ceil(song.lyrics.length / multiple);
             const embed = new Discord.MessageEmbed()
-            .setTitle(`${args.join(' ')}`)
+            .setTitle(`${arg}`)
             .setDescription(lyrics)
             .setColor(0xff0000)
             .setFooter(`Page ${page > maxPages ? maxPages : page} of ${maxPages}`);
 
             message.channel.send(embed).then(async (msg) => {
+                if (maxPages == 1) return;
                 msg.react('⬅️');
                 msg.react('➡️');
 
@@ -60,7 +75,7 @@ module.exports = {
 
                     const lyricsback = song.lyrics.slice(startback, endback);
                     const embedback = new Discord.MessageEmbed()
-                    .setTitle(`${args.join(' ')}`)
+                    .setTitle(`${arg}`)
                     .setDescription(lyricsback)
                     .setColor(0xff0000)
                     .setFooter(`Page ${page > maxPages ? maxPages : page} of ${maxPages}`);
@@ -85,7 +100,7 @@ module.exports = {
 
                     const lyricsnext = song.lyrics.slice(startnext, endnext);
                     const embednext = new Discord.MessageEmbed()
-                    .setTitle(`${args.join(' ')}`)
+                    .setTitle(`${arg}`)
                     .setDescription(lyricsnext)
                     .setColor(0xff0000)
                     .setFooter(`Page ${page > maxPages ? maxPages : page} of ${maxPages}`);

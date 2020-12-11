@@ -13,7 +13,7 @@ module.exports = {
         const array = [];
 
         const multiple = 10;
-        let page = args.length && Number(args[0]) ? Number(args[0]) : 1;
+        let page = 1;
 
         const end = page * multiple;
         const start = end - multiple;
