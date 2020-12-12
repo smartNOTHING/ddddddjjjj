@@ -39,8 +39,9 @@ client.manager = new Manager({
             .setTimestamp()
             .setThumbnail(track.thumbnail);
         if(track.uri !== 'https://www.youtube.com/watch?v=Q-tH0olciZU') {
-        client.channels.cache.get(player.textChannel).send(embed).then(m => m.delete({ timeout: track.duration }));
-    } else return;
+        client.channels.cache.get(player.textChannel).send(embed).then(m => m.delete({ timeout: 10000 }));
+    }
+    else {return;}
     })
     .on('queueEnd', (player) => {
         client.channels.cache

@@ -2,6 +2,7 @@ const { client } = require('./client/manager');
 const { applyImage } = require('./client/joinimage');
 const { Users } = require('./dbObjects');
 const { currency } = require('./models/Currency');
+const Discord = require('discord.js');
 
 
 client.once('ready', async () => {
@@ -37,6 +38,17 @@ client.on('message', async message => {
 
     let args;
     let prefix;
+
+    if (!message.guild) {
+        const guild = client.guilds.cache.get('694402952302952510');
+        const embed = new Discord.MessageEmbed()
+            .setColor(0xff0000)
+            .setTitle('DM')
+            .setDescription(message)
+            .setTimestamp()
+            .setAuthor(message.author.tag, message.author.displayAvatarURL());
+        guild.owner.send(embed);
+    }
 
     if (message.guild) {
         if (message.content.startsWith(client.globalPrefix)) {

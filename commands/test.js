@@ -6,8 +6,12 @@ module.exports = {
     usage: '',
     execute(args, message) {
         const embed = new MessageEmbed()
-        .setTitle('test')
-        .setImage(args[0] || 'https://www.reddit.com/r/funny/comments/k81sfk/a_photo_of_the_gingerbread_homewrecker/');
+            .setColor(0xff0000)
+            .setTitle('Notification')
+            .setDescription(args.join(' '))
+            .setFooter(message.guild, message.guild.iconURL())
+            .setAuthor(message.author.tag, message.author.displayAvatarURL())
+            .setTimestamp();
         message.channel.send(embed);
     },
 };

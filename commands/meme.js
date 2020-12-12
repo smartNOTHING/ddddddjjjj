@@ -6,8 +6,10 @@ module.exports = {
     description: 'meme',
     usage: '',
     async execute(args, message) {
+        const sub = args.length ? args.join('') : 'ComedySeizure';
+
         const embed = new MessageEmbed();
-        got('https://www.reddit.com/r/ComedySeizure/random/.json').then(response => {
+        got(`https://www.reddit.com/r/${sub}/random/.json`).then(response => {
             let content = JSON.parse(response.body);
             let permalink = content[0].data.children[0].data.permalink;
             let memeUrl = `https://reddit.com${permalink}`;

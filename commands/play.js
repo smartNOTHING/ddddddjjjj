@@ -54,7 +54,7 @@ module.exports = {
                 .map((track, index) => `${++index} - \`${track.title}\``)
                 .join('\n');
 
-            message.channel.send(results);
+            message.channel.send(results).then(async msg => {
 
             try {
               collected = await message.channel.awaitMessages(filter, { max: 1, time: 30e3, errors: ['time'] });
@@ -76,9 +76,11 @@ module.exports = {
 
             const track = res.tracks[index];
             player.queue.add(track);
+            msg.delete();
 
             if (!player.playing && !player.paused && !player.queue.size) return player.play();
             return message.reply(`adding \`${track.title}\` to the queue.`);
+        });
         }
     },
 };

@@ -1,16 +1,16 @@
-const Discord = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 
 module.exports = {
     name: 'help',
     description: 'Displays this message',
     usage: '',
     async execute(args, message, prefix) {
-        const embed = new Discord.MessageEmbed()
+        const embed = new MessageEmbed()
         .setTitle('Help')
         .setColor(0xff0000);
         const { client } = require('../bot');
-        const command = Array.from(client.commands);
-        const array = [];
+        const commands = client.commands;
+        let array = [];
 
         const multiple = 10;
         let page = 1;
@@ -18,27 +18,21 @@ module.exports = {
         const end = page * multiple;
         const start = end - multiple;
 
+        commands.forEach(c => array.push({ name: c.name, desc: c.usage || c.description }));
 
-            for(const i in command) {
-                if(!command[i][1].usage.length) {
-                    await array.push([{ name: command[i][1].name }, { desc: command[i][1].description }]);
-                }
-                else {
-                    await array.push([{ name: command[i][1].name }, { desc: command[i][1].usage }]);
-                }
-            }
+
             const coms = array.slice(start, end);
             const maxPages = Math.ceil(array.length / multiple);
             if(!coms.length) return message.reply(`There is no page ${page}`);
             for(let i in coms) {
                 let inline;
-                const name = `${prefix}${coms[i][0].name}`;
-                const value = coms[i][1].desc;
+                const name = `${prefix}${coms[i].name}`;
+                const value = coms[i].desc;
                 embed.addFields(
                     { name, value, inline },
                 );
-                embed.setFooter(`Page ${page > maxPages ? maxPages : page} of ${maxPages}`);
             }
+            embed.setFooter(`Page ${page > maxPages ? maxPages : page} of ${maxPages}`);
             message.channel.send(embed).then(async (msg) => {
                 msg.react('⬅️');
                 msg.react('➡️');
@@ -60,15 +54,15 @@ module.exports = {
                     const startback = endback - multiple;
 
                     const comsback = array.slice(startback, endback);
-                    const embedback = new Discord.MessageEmbed()
+                    const embedback = new MessageEmbed()
                     .setTitle('Help')
                     .setColor(0xff0000)
                     .setFooter(`Page ${page > maxPages ? maxPages : page} of ${maxPages}`);
 
                     for(let i in comsback) {
                         let inline;
-                        const name = `${prefix}${comsback[i][0].name}`;
-                        const value = comsback[i][1].desc;
+                        const name = `${prefix}${comsback[i].name}`;
+                        const value = comsback[i].desc;
                         embedback.addFields(
                             { name, value, inline },
                         );
@@ -93,15 +87,15 @@ module.exports = {
                     const startnext = endnext - multiple;
 
                     const comsforward = array.slice(startnext, endnext);
-                    const embednext = new Discord.MessageEmbed()
+                    const embednext = new MessageEmbed()
                     .setTitle('Help')
                     .setColor(0xff0000)
                     .setFooter(`Page ${page > maxPages ? maxPages : page} of ${maxPages}`);
 
                     for(let i in comsforward) {
                         let inline;
-                        const name = `${prefix}${comsforward[i][0].name}`;
-                        const value = comsforward[i][1].desc;
+                        const name = `${prefix}${comsforward[i].name}`;
+                        const value = comsforward[i].desc;
                         embednext.addFields(
                             { name, value, inline },
                         );
