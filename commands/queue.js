@@ -1,5 +1,4 @@
 const { MessageEmbed } = require('discord.js');
-const pms = require('pretty-ms');
 
 module.exports = {
     name: 'queue',
@@ -28,7 +27,7 @@ module.exports = {
         if (queue.current) embed.addField('Current', `[${queue.current.title}](${queue.current.uri}) - ${rem}`);
 
         if (!tracks.length) embed.setDescription(`No tracks in ${page > 1 ? `page ${page}` : 'the queue'}.`);
-        else embed.setDescription(tracks.map((track, i) => `${start + (++i)} - [${track.title}](${track.uri}) - ${pms(track.duration, { compact: true })}`).join('\n'));
+        else embed.setDescription(tracks.map((track, i) => `${start + (++i)} - [${track.title}](${track.uri}) - ${new Date(track.duration).toISOString().slice(14, 19)}`).join('\n'));
 
 
         const maxPages = queue.length ? Math.ceil(queue.length / multiple) : 1;

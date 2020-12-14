@@ -5,115 +5,98 @@ module.exports = {
     description: 'Displays this message',
     usage: '',
     async execute(args, message, prefix) {
+        message.delete();
+
+        function comsPage(conf, array) {
+            const end = conf.page * conf.multiple;
+            const start = end - conf.multiple;
+
+            return array.slice(start, end);
+        }
+
+        const conf = {
+            multiple: 10,
+            page: 1,
+        };
+
+        const array = message.client.commands.array();
+
+
+        let coms = await comsPage(conf, array);
+        const maxPages = Math.ceil(array.length / conf.multiple);
+
         const embed = new MessageEmbed()
-        .setTitle('Help')
-        .setColor(0xff0000);
-        const { client } = require('../bot');
-        const commands = client.commands;
-        let array = [];
+            .setTitle('Help')
+            .setColor(0xff0000)
+            .setFooter(`Page ${conf.page > maxPages ? maxPages : conf.page} of ${maxPages}`)
+            .setTimestamp();
 
-        const multiple = 10;
-        let page = 1;
+        for(let i in coms) {
+            embed.addField(`${prefix}${coms[i].name}`, `${coms[i].description}`);
+        }
 
-        const end = page * multiple;
-        const start = end - multiple;
+        message.channel.send(embed).then(async (m) => {
+            m.react('⬅️');
+            m.react('➡️');
 
-        commands.forEach(c => array.push({ name: c.name, desc: c.usage || c.description }));
-
-
-            const coms = array.slice(start, end);
-            const maxPages = Math.ceil(array.length / multiple);
-            if(!coms.length) return message.reply(`There is no page ${page}`);
-            for(let i in coms) {
-                let inline;
-                const name = `${prefix}${coms[i].name}`;
-                const value = coms[i].desc;
-                embed.addFields(
-                    { name, value, inline },
-                );
+            async function removeReac() {
+                const userReactions = m.reactions.cache.filter(reaction => reaction.users.cache.has(message.author.id));
+                try {
+                    for(const reaction of userReactions.values()) {
+                        await reaction.users.remove(message.author.id);
+                    }
+                }
+                    catch (error) {
+                        console.error('Failed to remove reactions.', error);
+                    }
             }
-            embed.setFooter(`Page ${page > maxPages ? maxPages : page} of ${maxPages}`);
-            message.channel.send(embed).then(async (msg) => {
-                msg.react('⬅️');
-                msg.react('➡️');
 
-                const forward = (reaction, user) => {
-                    return reaction.emoji.name === '➡️' && user.id === message.author.id;
-                };
-                const backward = (reaction, user) => {
-                    return reaction.emoji.name === '⬅️' && user.id === message.author.id;
-                };
+            const forward = (reaction, user) => {return reaction.emoji.name === '➡️' && user.id === message.author.id;};
+            const backward = (reaction, user) => {return reaction.emoji.name === '⬅️' && user.id === message.author.id;};
 
-                const backwardcol = msg.createReactionCollector(backward, { time: 15000 });
-                const forwardcol = msg.createReactionCollector(forward, { time: 15000 });
+            const backwardcol = m.createReactionCollector(backward, { time: 15000 });
+            const forwardcol = m.createReactionCollector(forward, { time: 15000 });
 
-                backwardcol.on('collect', async () => {
-                    page = page - 1;
-                    if(page < 1) return page = page + 1;
-                    const endback = page * multiple;
-                    const startback = endback - multiple;
+            backwardcol.on('collect', async () => {
+                conf.page = conf.page - 1;
+                if (conf.page < 1) {
+                    removeReac();
+                    return conf.page = conf.page + 1;
+                }
 
-                    const comsback = array.slice(startback, endback);
-                    const embedback = new MessageEmbed()
-                    .setTitle('Help')
-                    .setColor(0xff0000)
-                    .setFooter(`Page ${page > maxPages ? maxPages : page} of ${maxPages}`);
+                coms = await comsPage(conf, array);
 
-                    for(let i in comsback) {
-                        let inline;
-                        const name = `${prefix}${comsback[i].name}`;
-                        const value = comsback[i].desc;
-                        embedback.addFields(
-                            { name, value, inline },
-                        );
-                    }
+                embed.fields = [];
+                embed.setFooter(`Page ${conf.page > maxPages ? maxPages : conf.page} of ${maxPages}`);
 
-                    msg.edit(embedback);
+                for(let i in coms) {
+                    embed.addField(`${prefix}${coms[i].name}`, `${coms[i].description}`);
+                }
 
-                    const userReactions = msg.reactions.cache.filter(reaction => reaction.users.cache.has(message.author.id));
-                    try {
-                        for(const reaction of userReactions.values()) {
-                            await reaction.users.remove(message.author.id);
-                        }
-                    }
-                        catch (error) {
-                            console.error('Failed to remove reactions.');
-                        }
-                });
-                forwardcol.on('collect', async () => {
-                    page = page + 1;
-                    if(page > maxPages) return page = page - 1;
-                    const endnext = page * multiple;
-                    const startnext = endnext - multiple;
-
-                    const comsforward = array.slice(startnext, endnext);
-                    const embednext = new MessageEmbed()
-                    .setTitle('Help')
-                    .setColor(0xff0000)
-                    .setFooter(`Page ${page > maxPages ? maxPages : page} of ${maxPages}`);
-
-                    for(let i in comsforward) {
-                        let inline;
-                        const name = `${prefix}${comsforward[i].name}`;
-                        const value = comsforward[i].desc;
-                        embednext.addFields(
-                            { name, value, inline },
-                        );
-                    }
-
-                    msg.edit(embednext);
-
-                    const userReactions = msg.reactions.cache.filter(reaction => reaction.users.cache.has(message.author.id));
-                    try {
-                        for(const reaction of userReactions.values()) {
-                            await reaction.users.remove(message.author.id);
-                        }
-                    }
-                        catch (error) {
-                            console.error('Failed to remove reactions.');
-                        }
-
-                });
+                m.edit(embed);
+                await removeReac();
             });
+
+            forwardcol.on('collect', async () => {
+                conf.page = conf.page + 1;
+                if (conf.page > maxPages) {
+                    removeReac();
+                    return conf.page = maxPages;
+                }
+
+
+                coms = await comsPage(conf, array);
+
+                embed.fields = [];
+                embed.setFooter(`Page ${conf.page > maxPages ? maxPages : conf.page} of ${maxPages}`);
+
+                for(let i in coms) {
+                    embed.addField(`${prefix}${coms[i].name}`, `${coms[i].description}`);
+                }
+
+                m.edit(embed);
+                await removeReac();
+            });
+        });
     },
 };

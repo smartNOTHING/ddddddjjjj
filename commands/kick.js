@@ -5,26 +5,18 @@ module.exports = {
     args: true,
     admin: true,
     async execute(args, message) {
-        const req = require('./getUserFromMention');
-        const getUserFromMention = req.getUserFromMention;
 
-        if (args.length < 2) {
-            return message.reply('Please mention the user you want to kick and specify a reason');
-        }
+        const user = message.mentions.users.first();
+        if (!user) return message.reply('Please use a proper mention');
 
-        const user = getUserFromMention(args[0]);
-        if (!user) {
-            return message.reply('Please use a proper mention');
-        }
-
-        const reason = args.slice(1).join(' ');
+        const reason = args[1] ? args.slice(1).join(' ') : 'No Reason Given';
         const member = message.guild.members.resolve(user);
         try {
             await member.kick(reason);
         }
-        catch (error) {
-            return message.channel.send(`Failed to kick **${user.tag}**: ${error}`);
+        catch (e) {
+            return message.channel.send(`Failed to kick **${user.tag}**: ${e}`);
         }
-        return message.channel.send(`Successfully kicked **${user.tag}** from the server!`);
+        return message.channel.send(`Successfully kicked **${user.tag}** for **${reason}**`);
     },
 };

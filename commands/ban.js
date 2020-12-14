@@ -5,25 +5,16 @@ module.exports = {
     args: true,
     admin: true,
     async execute(args, message) {
-        const req = require('./getUserFromMention');
-        const getUserFromMention = req.getUserFromMention;
+        const user = message.mentions.users.first();
+        if(!user) return message.reply('Please use a proper mention');
 
-        if (args.length < 2) {
-            return message.reply('Please mention the user you want to ban and specify a reason');
-        }
-
-        const user = getUserFromMention(args[0]);
-        if (!user) {
-            return message.reply('Please use a proper mention');
-        }
-
-        const reason = args.slice(1).join(' ');
+        const reason = args[1] ? args.slice(1).join(' ') : 'No Reason Given';
         try {
             await message.guild.members.ban(user, { reason });
         }
-        catch (error) {
-            return message.channel.send(`Failed to ban **${user.tag}**: ${error}`);
+        catch (e) {
+            return message.channel.send(`Failed to ban **${user.tag}**: ${e}`);
         }
-        return message.channel.send(`Successfully banned **${user.tag}** from the server!`);
+        return message.channel.send(`Successfully banned **${user.tag}** for **${reason}**`);
     },
 };

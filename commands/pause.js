@@ -10,7 +10,7 @@ module.exports = {
 
         if (!channel) return message.reply('You need to be in a voice channel');
         if (channel.id !== player.voiceChannel) return message.reply('Youre not in the same voice channel as the bot');
-        if (player.paused) return message.reply('The player is already pause');
+        if (player.paused) return message.reply('The player is already paused');
 
         player.pause(true);
         return message.reply('Paused the player');

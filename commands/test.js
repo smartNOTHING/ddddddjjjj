@@ -1,17 +1,19 @@
-const { MessageEmbed } = require('discord.js');
+const fs = require('fs');
+const got = require('got');
+const jdsom = require('jsdom');
+const { JSDOM } = jdsom;
 
 module.exports = {
     name: 'test',
     description: 'test',
     usage: '',
     execute(args, message) {
-        const embed = new MessageEmbed()
-            .setColor(0xff0000)
-            .setTitle('Notification')
-            .setDescription(args.join(' '))
-            .setFooter(message.guild, message.guild.iconURL())
-            .setAuthor(message.author.tag, message.author.displayAvatarURL())
-            .setTimestamp();
-        message.channel.send(embed);
+        const url = 'http://scp-wiki.wikidot.com/scp-3894';
+
+        got(url).then(response => {
+            const dom = new JSDOM(response.body);
+            const text = dom.window.document.getElementById('');
+            console.log(text);
+        }).catch(err => console.log(err));
     },
 };
